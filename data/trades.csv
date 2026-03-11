@@ -2,3 +2,4 @@ trade_id,symbol,quantity,price,side,trade_date
 T1,AAPL,100,150,BUY,2026-02-10
 T2,GOOG,50,200,SELL,2026-02-10
 T3,GOOG,-50,200,SELL,2026-02-10
+T4,goog,50,200,sell,2026-02-10
