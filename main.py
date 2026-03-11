@@ -4,6 +4,7 @@ from app.validation.trade_validator import TradeValidator
 from app.normalization.trade_normalizer import TradeNormalizer
 from app.persistence.mysql_repo import MySQLRepository
 from app.reconciliation.recon_engine import ReconciliationEngine
+from app.pnl.pnl_engine import PnLEngine
 
 
 def main():
@@ -41,6 +42,15 @@ def main():
 
         except Exception as e:
             print(f"Trade {trade.get('trade_id')} failed: {e}")
+
+    # P&L computation
+    pnl_engine = PnLEngine()
+
+    db_trades = db.fetch_trades()
+
+    pnl = pnl_engine.calculate_pnl(db_trades)
+
+    print("\nDaily P&L:", pnl)
 
 
 if __name__ == "__main__":
