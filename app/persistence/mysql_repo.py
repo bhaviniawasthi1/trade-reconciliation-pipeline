@@ -26,3 +26,15 @@ class MySQLRepository:
 
         self.cursor.execute(query, values)
         self.conn.commit()
+
+    def insert_exception(self, trade_id, reason):
+
+        query = """
+        INSERT INTO exceptions (trade_id, reason)
+        VALUES (%s, %s)
+        """
+
+        values = (trade_id, reason)
+
+        self.cursor.execute(query, values)
+        self.conn.commit()

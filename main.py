@@ -1,14 +1,18 @@
 from app.ingestion.csv_reader import read_trades_from_csv
+from app.ingestion.settlement_reader import read_settlements
 from app.validation.trade_validator import TradeValidator
 from app.normalization.trade_normalizer import TradeNormalizer
 from app.persistence.mysql_repo import MySQLRepository
+from app.reconciliation.recon_engine import ReconciliationEngine
 
 
 def main():
 
     trades = read_trades_from_csv("data/trades.csv")
+    settlements = read_settlements("data/settlements.csv")
 
     db = MySQLRepository()
+    recon = ReconciliationEngine()
 
     print("Processing trades...")
 
@@ -21,10 +25,21 @@ def main():
 
             db.insert_trade(normalized_trade)
 
-            print(f"Trade {trade['trade_id']} inserted into database.")
+            trade_id = normalized_trade["trade_id"]
+
+            if trade_id in settlements:
+
+                mismatches = recon.reconcile(
+                    normalized_trade,
+                    settlements[trade_id]
+                )
+
+                for reason in mismatches:
+                    db.insert_exception(trade_id, reason)
+
+            print(f"Trade {trade_id} processed")
 
         except Exception as e:
-
             print(f"Trade {trade.get('trade_id')} failed: {e}")
 
 
